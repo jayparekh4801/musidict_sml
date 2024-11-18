@@ -145,7 +145,7 @@
             formData.append('duration', duration);
             formData.append('audio_file', audioBlob, "recording.wav");
             const outputField = document.getElementById("outputField");
-            fetch('http://127.0.0.1:8000/upload', {
+            fetch('/upload', {
                 method: 'POST',
                 body: formData
             }).then((response) => {
