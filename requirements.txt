@@ -1,0 +1,15 @@
+numpy
+pandas
+scikit-learn
+torch
+lightning
+fastapi
+python-multipart
+uvicorn
+pydub
+librosa
+dill
+jinja2
+seaborn
+matplotlib
+#-e .
