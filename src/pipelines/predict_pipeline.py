@@ -20,17 +20,18 @@ class PredictPipeline:
     def __init__(self) -> None:
         self.model_path = os.path.join(os.getcwd(), "epoch=56-step=5871.pth")
         self.transformer_obj_path = os.path.join(os.getcwd(), "artifacts", "transformation.pkl")
-    
-    def predict(self, data):
         criterion = nn.CrossEntropyLoss()
         learning_rate = 0.001
         dropout_prob = 0.3
-        model = model_trainer.MusicSuccessPredictor(loss_fn=criterion,learning_rate=learning_rate,dropout_prob=dropout_prob)
-        model.load_state_dict(torch.load(self.model_path, weights_only=True))
-        transform_obj = utils.load_object(self.transformer_obj_path)
+        self.model = model_trainer.MusicSuccessPredictor(loss_fn=criterion,learning_rate=learning_rate,dropout_prob=dropout_prob)
+        self.model.load_state_dict(torch.load(self.model_path, weights_only=True))
+        self.transform_obj = utils.load_object(self.transformer_obj_path)
+    
+    def predict(self, data):
+        
         data_df = utils.process_music(data)
 
-        transformed_data = transform_obj.transform(data_df)
+        transformed_data = self.transform_obj.transform(data_df)
         
         transformed_data = np.column_stack((data_df["genre"].values, transformed_data))
 
@@ -50,13 +51,13 @@ class PredictPipeline:
                 transformed_data['duration'].float(),   # Scalar (batch_size, 1)
                 transformed_data['genre'].float()      # Categorical scalar (batch_size, 1)
             ), dim=1)
-        output = model(mel_spectrogram, mfccs, chroma, spectral_contrast, tonnetz, zcr, spectral_centroid, spectral_bandwidth, rms_energy, scalar_features)
+        output = self.model(mel_spectrogram, mfccs, chroma, spectral_contrast, tonnetz, zcr, spectral_centroid, spectral_bandwidth, rms_energy, scalar_features)
 
         one_hot_output = torch.zeros(size=(1, 3))
 
         one_hot_output[:,torch.argmax(output)] = 1
 
-        output_transformer = transform_obj.named_transformers_['cat_transforms']
+        output_transformer = self.transform_obj.named_transformers_['cat_transforms']
 
         result = output_transformer.inverse_transform(one_hot_output)
 

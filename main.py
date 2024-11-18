@@ -9,6 +9,8 @@ from src.components.array_column_transformer import ArrayColumnTransformer
 from src.utils import load_object
 from fastapi.middleware.cors import CORSMiddleware
 
+model = predict_pipeline.PredictPipeline()
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
@@ -47,7 +49,7 @@ async def upload_audio(
         "file_path": file_path
     }
     print(metadata)
-    result = predict_pipeline.PredictPipeline().predict(metadata)
+    result = model.predict(metadata)
     print(result[0][0])
     return JSONResponse(content={
         "message": f"Audio file converted to MP3 and uploaded successfully!",
