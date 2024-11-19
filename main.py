@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import os
+import uvicorn
 
 from src.pipelines import predict_pipeline
 from src.components.array_column_transformer import ArrayColumnTransformer
-from src.utils import load_object
 from fastapi.middleware.cors import CORSMiddleware
 
 model = predict_pipeline.PredictPipeline()
@@ -56,5 +56,8 @@ async def upload_audio(
         "data": result[0][0]
         })
 
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0",port=port)
 
 
